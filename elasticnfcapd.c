@@ -381,6 +381,7 @@ int main(int argc, char* argv[])
 {
     elastic_nfcapd_t* enf;
     int next_option;
+    int should_create = 0;
     const char* short_options = "hc:f:u:s:r:d:";
     const struct option long_options [] = {
         {   "help"  , 0 , NULL, 'h'  },
@@ -404,8 +405,7 @@ int main(int argc, char* argv[])
                 break;
             case 'c':
                 strncpy((char*)&enf->indexname, optarg, 512);
-                printf("Crerate the index %s and its mapping\n" ,
-                       enf->indexname);
+                should_create = 1;
                 break;
             case 'f':
                 strncpy((char*)&enf->nfcapdfilename, optarg,512);
@@ -430,7 +430,19 @@ int main(int argc, char* argv[])
                 return EXIT_FAILURE;
         }
     } while ( next_option != -1 ); 
-    
-    printf("Used url %s\n",enf->baseurl); 
+    /* Create index if asked */
+    if (should_create) {
+            printf("[INFO] Creating index ...\n");
+            printf("[INFO] URL: %s\n", enf->baseurl);
+            printf("[INFO] indexname: %s\n",enf->indexname);
+        if (create_index(enf)) {
+            printf("[INFO] Successfully created index\n");
+            //TODO create mapping
+            return EXIT_SUCCESS;
+        } else {
+            fprintf(stderr, "[ERROR] Index creating failed\n");
+            return EXIT_FAILURE;
+        }
+    } 
     return EXIT_SUCCESS;
 }
