@@ -29,6 +29,7 @@
 #define URLROOT "http://localhost:9200/test2/test/"
 #define BASEURL "http://localhost:9200"
 #define DEFAULT_INDEX "netflow"
+#define DEFAULT_DOCTYPE "nfcapd"
 #define IMPORTCHUNKS 10 
 #define SIZE_PER_CHUNK 300 
 #define NUM_REPLICAS 2
@@ -49,6 +50,7 @@ typedef struct elastic_nfcapd_s {
     char nfcapdfilename[512];
     char indexname[512];
     char baseurl[512];
+    char doctype[512];
     int num_shards;
     int num_repl;
 } elastic_nfcapd_t;
@@ -296,6 +298,7 @@ elastic_nfcapd_t* init_elastic_nfcapd(void)
     out->num_repl = NUM_REPLICAS;
     strncpy((char*)&out->baseurl, BASEURL, 512);
     strncpy((char*)&out->indexname, DEFAULT_INDEX, 512);
+    strncpy((char*)&out->doctype, DEFAULT_DOCTYPE, 512);
     return out;
 }
 
@@ -378,7 +381,7 @@ int main(int argc, char* argv[])
 {
     elastic_nfcapd_t* enf;
     int next_option;
-    const char* short_options = "hc:f:u:s:r:";
+    const char* short_options = "hc:f:u:s:r:d:";
     const struct option long_options [] = {
         {   "help"  , 0 , NULL, 'h'  },
         {   "create", 0,  NULL, 'c'  },
@@ -386,6 +389,7 @@ int main(int argc, char* argv[])
         {   "url",    0,  NULL, 'u'  },
         {   "shards", 1,  NULL, 's'  },
         {   "replicas", 1, NULL, 'r' },
+        {   "doctype",1,  NULL, 'd'  },
         {   NULL,     0,  NULL, 0    }
     };
    
@@ -417,6 +421,9 @@ int main(int argc, char* argv[])
             case 'r':
                 enf->num_repl = atoi(optarg);
                 break; 
+            case 'd':
+                strncpy((char*)&enf->doctype, optarg, 512);
+                break;
             case -1:
                 break;
             default:
