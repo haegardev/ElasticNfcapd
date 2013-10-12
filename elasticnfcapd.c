@@ -25,6 +25,7 @@
 #include <string.h>
 #include <time.h>
 #include <arpa/inet.h>
+#include <getopt.h>
 #define URLROOT "http://localhost:9200/test2/test/"
 #define BASEURL "http://localhost:9200"
 #define IMPORTCHUNKS 10 
@@ -361,6 +362,36 @@ int process_nfcapd_files(char* filename)
 
 int main(int argc, char* argv[])
 {
-    printf("NYI\n");
+    char *nfcapdfilename;
+    int next_option;
+    const char* short_options = "hcr:";
+    const struct option long_options [] = {
+        {   "help"  , 0 , NULL, 'h'  },
+        {   "create", 0,  NULL, 'c'  },
+        {   "read",   0,  NULL, 'r'  },
+        {   NULL,     0,  NULL, 0    }
+    };
+   
+    do {
+        next_option = getopt_long(argc, argv, short_options, 
+                                  long_options, NULL);
+        switch ( next_option ) {
+            case 'h':
+                printf("Print help screen\n");
+                break;
+            case 'c':
+                printf("Crerate the index and its mapping\n");
+                break;
+            case 'r':
+                nfcapdfilename = optarg;
+                printf("Index the nfcapd file %s\n",nfcapdfilename);
+                break;
+            case -1:
+                break;
+            default:
+                return EXIT_FAILURE;
+        }
+    } while ( next_option != -1 ); 
+    
     return EXIT_SUCCESS;
 }
