@@ -48,6 +48,8 @@ typedef struct elastic_nfcapd_s {
     char nfcapdfilename[512];
     char indexname[512];
     char baseurl[512];
+    int num_shards;
+    int num_repl;
 } elastic_nfcapd_t;
 
 int num_shards;
@@ -370,12 +372,14 @@ int main(int argc, char* argv[])
 {
     elastic_nfcapd_t* enf;
     int next_option;
-    const char* short_options = "hc:f:u:";
+    const char* short_options = "hc:f:u:s:r:";
     const struct option long_options [] = {
         {   "help"  , 0 , NULL, 'h'  },
         {   "create", 0,  NULL, 'c'  },
         {   "file",   0,  NULL, 'f'  },
         {   "url",    0,  NULL, 'u'  },
+        {   "shards", 1,  NULL, 's'  },
+        {   "replicas", 1, NULL, 'r' },
         {   NULL,     0,  NULL, 0    }
     };
    
@@ -401,6 +405,12 @@ int main(int argc, char* argv[])
             case 'u':
                 strncpy(enf->baseurl, optarg, 512);
                 break;
+            case 's':
+                enf->num_shards = atoi(optarg);
+                break;
+            case 'r':
+                enf->num_repl = atoi(optarg);
+                break; 
             case -1:
                 break;
             default:
