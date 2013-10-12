@@ -237,14 +237,14 @@ int create_mapping(char* baseurl, char* indexname, char* doctype)
 }
 
     
-
+//TODO set default index name
 /* Creates an index on elasticsearch server specified by the baseurl parameter
  * The index is defined with the indexname parameter
  *
  * Returns 1 on success
  * Returns 0 on error
  */
-int create_index(char* baseurl, char* indexname)
+int create_index(elastic_nfcapd_t* enf)
 {
     CURL* curl;
     char *payload;
@@ -260,7 +260,7 @@ int create_index(char* baseurl, char* indexname)
     url = xalloc(1024,1);
     
     curl = curl_easy_init();
-    snprintf(url, 1024, "%s/%s",baseurl, indexname);
+    snprintf(url, 1024, "%s/%s",enf->baseurl, enf->indexname);
     snprintf(payload, 1024, "{\
 \"settings\" : {\
         \"index\" : {\
@@ -268,7 +268,7 @@ int create_index(char* baseurl, char* indexname)
             \"number_of_replicas\" : %d\
         }\
     }\
-}", num_shards, num_repl);  
+}", enf->num_shards, enf->num_repl);  
     r = send_json_request(curl, url, payload, reply, 1024);
     if (r == 200) {
         /* Assume that the request went fine and ignore the reply */
