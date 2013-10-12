@@ -363,15 +363,20 @@ int process_nfcapd_files(char* filename)
 int main(int argc, char* argv[])
 {
     char *nfcapdfilename;
+    char* indexname;
+    char *baseurl;
+
     int next_option;
-    const char* short_options = "hcr:";
+    const char* short_options = "hc:r:u:";
     const struct option long_options [] = {
         {   "help"  , 0 , NULL, 'h'  },
         {   "create", 0,  NULL, 'c'  },
         {   "read",   0,  NULL, 'r'  },
+        {   "url",    0,  NULL, 'u'  },
         {   NULL,     0,  NULL, 0    }
     };
    
+    baseurl = xalloc(512,1);
     do {
         next_option = getopt_long(argc, argv, short_options, 
                                   long_options, NULL);
@@ -380,11 +385,15 @@ int main(int argc, char* argv[])
                 printf("Print help screen\n");
                 break;
             case 'c':
-                printf("Crerate the index and its mapping\n");
+                indexname = optarg;
+                printf("Crerate the index %s and its mapping\n",indexname);
                 break;
             case 'r':
                 nfcapdfilename = optarg;
                 printf("Index the nfcapd file %s\n",nfcapdfilename);
+                break;
+            case 'u':
+                strncpy(baseurl,optarg,512);
                 break;
             case -1:
                 break;
@@ -393,5 +402,10 @@ int main(int argc, char* argv[])
         }
     } while ( next_option != -1 ); 
     
+    /* Set default values if not specified */
+    if (!baseurl[0])
+        strncpy(baseurl, BASEURL,512);
+
+    printf("Used url %s\n",baseurl); 
     return EXIT_SUCCESS;
 }
