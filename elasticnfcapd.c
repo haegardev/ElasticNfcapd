@@ -287,13 +287,18 @@ int create_index(char* baseurl, char* indexname)
 }
 
 
-
-void init(void)
+/* Inititalize the default parameters */
+elastic_nfcapd_t* init_elastic_nfcapd(void)
 {
-    num_shards = NUM_SHARDS;
-    num_repl = NUM_REPLICAS;
+    elastic_nfcapd_t *out;
+    out = xalloc(sizeof(elastic_nfcapd_t), 1 );
+    out->num_shards = NUM_SHARDS;
+    out->num_repl = NUM_REPLICAS;
+    strncpy((char*)&out->baseurl, BASEURL, 512);
+    return out;
 }
 
+/* FIXME pass elastic_nfcapd_t as param */
 int process_nfcapd_files(char* filename)
 {
     libnfstates_t* states;
@@ -308,7 +313,7 @@ int process_nfcapd_files(char* filename)
     size_t rsize; //remaining size
     size_t num_bytes;
     
-    init();
+    //init();
 
     headers = NULL;
     jsonbuf = calloc(IMPORTCHUNKS*SIZE_PER_CHUNK,1);
@@ -383,7 +388,7 @@ int main(int argc, char* argv[])
         {   NULL,     0,  NULL, 0    }
     };
    
-    enf = xalloc(sizeof(elastic_nfcapd_t),1);
+    enf = init_elastic_nfcapd();
 
     do {
         next_option = getopt_long(argc, argv, short_options, 
@@ -418,10 +423,6 @@ int main(int argc, char* argv[])
         }
     } while ( next_option != -1 ); 
     
-    /* Set default values if not specified */
-    if (!enf->baseurl[0])
-        strncpy(enf->baseurl, BASEURL,512);
-
     printf("Used url %s\n",enf->baseurl); 
     return EXIT_SUCCESS;
 }
