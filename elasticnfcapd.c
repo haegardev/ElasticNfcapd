@@ -28,6 +28,7 @@
 #include <getopt.h>
 #define URLROOT "http://localhost:9200/test2/test/"
 #define BASEURL "http://localhost:9200"
+#define DEFAULT_INDEX "netflow"
 #define IMPORTCHUNKS 10 
 #define SIZE_PER_CHUNK 300 
 #define NUM_REPLICAS 2
@@ -237,7 +238,6 @@ int create_mapping(char* baseurl, char* indexname, char* doctype)
 }
 
     
-//TODO set default index name
 /* Creates an index on elasticsearch server specified by the baseurl parameter
  * The index is defined with the indexname parameter
  *
@@ -295,6 +295,7 @@ elastic_nfcapd_t* init_elastic_nfcapd(void)
     out->num_shards = NUM_SHARDS;
     out->num_repl = NUM_REPLICAS;
     strncpy((char*)&out->baseurl, BASEURL, 512);
+    strncpy((char*)&out->indexname, DEFAULT_INDEX, 512);
     return out;
 }
 
