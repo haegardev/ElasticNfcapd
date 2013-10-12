@@ -413,7 +413,7 @@ int main(int argc, char* argv[])
                         enf->nfcapdfilename);
                 break;
             case 'u':
-                strncpy(enf->baseurl, optarg, 512);
+                strncpy((char*)&enf->baseurl, optarg, 512);
                 break;
             case 's':
                 enf->num_shards = atoi(optarg);
