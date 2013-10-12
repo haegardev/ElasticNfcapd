@@ -370,11 +370,11 @@ int main(int argc, char* argv[])
 {
     elastic_nfcapd_t* enf;
     int next_option;
-    const char* short_options = "hc:r:u:";
+    const char* short_options = "hc:f:u:";
     const struct option long_options [] = {
         {   "help"  , 0 , NULL, 'h'  },
         {   "create", 0,  NULL, 'c'  },
-        {   "read",   0,  NULL, 'r'  },
+        {   "file",   0,  NULL, 'f'  },
         {   "url",    0,  NULL, 'u'  },
         {   NULL,     0,  NULL, 0    }
     };
@@ -393,7 +393,7 @@ int main(int argc, char* argv[])
                 printf("Crerate the index %s and its mapping\n" ,
                        enf->indexname);
                 break;
-            case 'r':
+            case 'f':
                 strncpy((char*)&enf->nfcapdfilename, optarg,512);
                 printf("Index the nfcapd file %s\n" , 
                         enf->nfcapdfilename);
