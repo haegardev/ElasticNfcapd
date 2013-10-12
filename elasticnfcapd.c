@@ -44,6 +44,12 @@
 #   define htonll(n)    (((uint64_t)htonl(n)) << 32) + htonl((n) >> 32)
 #endif
 
+typedef struct elastic_nfcapd_s {
+    char nfcapdfilename[512];
+    char indexname[512];
+    char baseurl[512];
+} elastic_nfcapd_t;
+
 int num_shards;
 int num_repl;
 
@@ -362,10 +368,7 @@ int process_nfcapd_files(char* filename)
 
 int main(int argc, char* argv[])
 {
-    char *nfcapdfilename;
-    char* indexname;
-    char *baseurl;
-
+    elastic_nfcapd_t* enf;
     int next_option;
     const char* short_options = "hc:r:u:";
     const struct option long_options [] = {
@@ -376,7 +379,8 @@ int main(int argc, char* argv[])
         {   NULL,     0,  NULL, 0    }
     };
    
-    baseurl = xalloc(512,1);
+    enf = xalloc(sizeof(elastic_nfcapd_t),1);
+
     do {
         next_option = getopt_long(argc, argv, short_options, 
                                   long_options, NULL);
@@ -385,15 +389,17 @@ int main(int argc, char* argv[])
                 printf("Print help screen\n");
                 break;
             case 'c':
-                indexname = optarg;
-                printf("Crerate the index %s and its mapping\n",indexname);
+                strncpy((char*)&enf->indexname, optarg, 512);
+                printf("Crerate the index %s and its mapping\n" ,
+                       enf->indexname);
                 break;
             case 'r':
-                nfcapdfilename = optarg;
-                printf("Index the nfcapd file %s\n",nfcapdfilename);
+                strncpy((char*)&enf->nfcapdfilename, optarg,512);
+                printf("Index the nfcapd file %s\n" , 
+                        enf->nfcapdfilename);
                 break;
             case 'u':
-                strncpy(baseurl,optarg,512);
+                strncpy(enf->baseurl, optarg, 512);
                 break;
             case -1:
                 break;
@@ -403,9 +409,9 @@ int main(int argc, char* argv[])
     } while ( next_option != -1 ); 
     
     /* Set default values if not specified */
-    if (!baseurl[0])
-        strncpy(baseurl, BASEURL,512);
+    if (!enf->baseurl[0])
+        strncpy(enf->baseurl, BASEURL,512);
 
-    printf("Used url %s\n",baseurl); 
+    printf("Used url %s\n",enf->baseurl); 
     return EXIT_SUCCESS;
 }
