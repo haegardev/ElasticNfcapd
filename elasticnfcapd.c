@@ -193,32 +193,42 @@ int create_mapping(elastic_nfcapd_t* enf)
         \"bytes\" : {\
           \"type\" : \"long\"\
         },\
-        \"dstaddr\" : {\
-          \"type\" : \"string\"\
+        \"dstaddrv4\" : {\
+          \"type\" : \"ip\"\
+        },\
+        \"dstaddrv6\": {\
+           \"type\":\"string\"\
         },\
         \"dstas\" : {\
-          \"type\" : \"long\"\
+          \"type\" : \"integer\"\
         },\
         \"dstport\" : {\
-          \"type\" : \"long\"\
+          \"type\" : \"integer\"\
         },\
         \"firstseen\" : {\
-          \"type\" : \"string\"\
+          \"type\" : \"date\",\
+          \"format\":\"YYYY-MM-dd H:m:s.SSS\",\
+          \"locale\":\"CET\"\
         },\
         \"flows\" : {\
           \"type\" : \"long\"\
         },\
         \"lastseen\" : {\
-          \"type\" : \"string\"\
+          \"type\" : \"date\",\
+          \"format\":\"YYYY-MM-dd H:m:s.SSS\",\
+          \"locate\" : \"CET\"\
         },\
-        \"srcaddr\" : {\
-          \"type\" : \"string\"\
+        \"srcaddrv4\" : {\
+          \"type\" : \"ip\"\
+        },\
+        \"srcaddrv6\" : {\
+          \"type\":\"string\"\
         },\
         \"srcas\" : {\
-          \"type\" : \"long\"\
+          \"type\" : \"integer\"\
         },\
         \"srcport\" : {\
-          \"type\" : \"string\"\
+          \"type\" : \"integer\"\
         }\
        }\
       }\
