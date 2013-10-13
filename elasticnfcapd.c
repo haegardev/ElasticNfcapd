@@ -173,7 +173,7 @@ int send_json_request(CURL* curl, char* url, char* jsondoc, char* replymsg,
  * FIXME this mapping should be optimized with better core types of 
  * elasticsearch
  */
-int create_mapping(char* baseurl, char* indexname, char* doctype)
+int create_mapping(elastic_nfcapd_t* enf)
 {
     char *url;
     char* payload;
@@ -185,7 +185,8 @@ int create_mapping(char* baseurl, char* indexname, char* doctype)
     reply = xalloc(1,1024);
     /* Default error value */
     r = 0; 
-    snprintf(url, 1024, "%s/%s/%s/_mapping",baseurl, indexname, doctype);
+    snprintf(url, 1024, "%s/%s/%s/_mapping",enf->baseurl, enf->indexname,
+             enf->doctype);
     snprintf(payload, 1024,"\
       {\"nfrecord\": {\
       \"properties\" : {\
@@ -437,8 +438,13 @@ int main(int argc, char* argv[])
             printf("[INFO] indexname: %s\n",enf->indexname);
         if (create_index(enf)) {
             printf("[INFO] Successfully created index\n");
-            //TODO create mapping
-            return EXIT_SUCCESS;
+            if (create_mapping(enf)) {
+                printf("[INFO] Successfully created mapping\n");
+                return EXIT_SUCCESS;
+            }   else {
+                fprintf(stderr,"[ERROR] Failed to create mapping\n");
+                return EXIT_FAILURE; 
+            }
         } else {
             fprintf(stderr, "[ERROR] Index creating failed\n");
             return EXIT_FAILURE;
