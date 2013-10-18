@@ -112,7 +112,7 @@ int build_json_doc(char* jsonbuffer, size_t size, master_record_t* r)
             //TODO test integer encoding for IPaddresses
             return snprintf(jsonbuffer, size,"{\"firstseen\":\"%s\",\
 \"lastseen\":\"%s\", \"srcaddr\":\"%s\", \"dstaddr\":\"%s\",\"srcport\":\"%d\",\
-\"dstport\":%d, \"bytes\":%ld,\"flows\":%ld,\"srcas\":%d,\"dstas\":%d}", 
+\"dstport\":%d, \"bytes\":%ld,\"flows\":%ld,\"srcas\":%d,\"dstas\":%d}\n", 
 firstseen, lastseen, as, ds, r->srcport, r->dstport, r->out_bytes, 
 r->aggr_flows, r->srcas,r->dstas);
         }
@@ -352,9 +352,11 @@ int process_nfcapd_files(elastic_nfcapd_t* enf)
                 /* Fill the buffer */
                 //printf("DEBUG: rsize: %ld\n",rsize);
                 // Build description
-                snprintf((char*)&enf->recdesc,1024, \
-                "{\"index\": {\"_index\":\"%s\",\"_type\":\"%s\",\"_id\":%ld}}",
+                num_bytes = snprintf(p,1024, \
+                "{\"index\": {\"_index\":\"%s\",\"_type\":\"%s\",\"_id\":%ld}}\n",
                 enf->indexname, enf->doctype, cnt);
+                p+=num_bytes;
+                rsize-=num_bytes;
                 num_bytes = build_json_doc(p, rsize,rec);
                 //printf("DEBUG: num_bytes: %ld\n",num_bytes);
                 //printf("DEBUG: %s\n",jsonbuf);
@@ -362,6 +364,9 @@ int process_nfcapd_files(elastic_nfcapd_t* enf)
                 rsize-=num_bytes;
                 if (rsize < SIZE_PER_CHUNK) { 
                     //printf("DEBUG: There is not enough space for placing the next chunk %ld\n",rsize);
+                    printf("----- BEGIN DUMP ---\n");
+                    printf("%s\n",jsonbuf);
+                    printf("----- END DUMP ---\n");
                     jsonbuf[0] = 0;
                     p = jsonbuf;
                     rsize = IMPORTCHUNKS * SIZE_PER_CHUNK;
@@ -422,8 +427,6 @@ int main(int argc, char* argv[])
                 break;
             case 'f':
                 strncpy((char*)&enf->nfcapdfilename, optarg,512);
-                printf("Index the nfcapd file %s\n" , 
-                        enf->nfcapdfilename);
                 break;
             case 'u':
                 strncpy((char*)&enf->baseurl, optarg, 512);
@@ -461,6 +464,9 @@ int main(int argc, char* argv[])
             fprintf(stderr, "[ERROR] Index creating failed\n");
             return EXIT_FAILURE;
         }
-    } 
+    }
+    if (enf->nfcapdfilename[0]) {
+        return process_nfcapd_files(enf);
+    }
     return EXIT_SUCCESS;
 }
