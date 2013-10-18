@@ -344,7 +344,7 @@ int process_nfcapd_files(elastic_nfcapd_t* enf)
             if (rec) {
                 cnt++;
                 num_bytes = snprintf(p,1024, \
-                "{\"index\": {\"_index\":\"%s\",\"_type\":\"%s\",\"_id\":%ld}}\n",
+                "{\"index\": {\"_index\":\"%s\",\"_type\":\"%s\",\"_id\":\"%ld\"}}\n",
                 enf->indexname, enf->doctype, cnt);
                 p+=num_bytes;
                 rsize-=num_bytes;
