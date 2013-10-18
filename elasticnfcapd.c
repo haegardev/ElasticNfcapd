@@ -111,7 +111,7 @@ int build_json_doc(char* jsonbuffer, size_t size, master_record_t* r)
             //TODO check bytes and endianness of ports
             //TODO test integer encoding for IPaddresses
             return snprintf(jsonbuffer, size,"{\"firstseen\":\"%s\",\
-\"lastseen\":\"%s\", \"srcaddr\":\"%s\", \"dstaddr\":\"%s\",\"srcport\":\"%d\",\
+\"lastseen\":\"%s\", \"srcaddrv4\":\"%s\", \"dstaddrv4\":\"%s\",\"srcport\":\"%d\",\
 \"dstport\":%d, \"bytes\":%ld,\"flows\":%ld,\"srcas\":%d,\"dstas\":%d}\n", 
 firstseen, lastseen, as, ds, r->srcport, r->dstport, r->out_bytes, 
 r->aggr_flows, r->srcas,r->dstas);
