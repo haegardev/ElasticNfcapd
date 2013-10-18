@@ -53,6 +53,7 @@ typedef struct elastic_nfcapd_s {
     char doctype[512];
     int num_shards;
     int num_repl;
+    char recdesc[1024];
 } elastic_nfcapd_t;
 
 int num_shards;
@@ -313,8 +314,7 @@ elastic_nfcapd_t* init_elastic_nfcapd(void)
     return out;
 }
 
-/* FIXME pass elastic_nfcapd_t as param */
-int process_nfcapd_files(char* filename)
+int process_nfcapd_files(elastic_nfcapd_t* enf)
 {
     libnfstates_t* states;
     master_record_t* rec;
@@ -328,8 +328,6 @@ int process_nfcapd_files(char* filename)
     size_t rsize; //remaining size
     size_t num_bytes;
     
-    //init();
-
     headers = NULL;
     jsonbuf = calloc(IMPORTCHUNKS*SIZE_PER_CHUNK,1);
     rsize = IMPORTCHUNKS * SIZE_PER_CHUNK;
@@ -345,7 +343,7 @@ int process_nfcapd_files(char* filename)
     curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
     headers = curl_slist_append(headers, "Content-Type: application/json");
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers); 
-    states = initlib(NULL, filename, NULL);
+    states = initlib(NULL, enf->nfcapdfilename, NULL);
     if (states) {
         do {
             rec = get_next_record(states);
@@ -353,6 +351,10 @@ int process_nfcapd_files(char* filename)
                 cnt++;
                 /* Fill the buffer */
                 //printf("DEBUG: rsize: %ld\n",rsize);
+                // Build description
+                snprintf((char*)&enf->recdesc,1024, \
+                "{\"index\": {\"_index\":\"%s\",\"_type\":\"%s\",\"_id\":%ld}}",
+                enf->indexname, enf->doctype, cnt);
                 num_bytes = build_json_doc(p, rsize,rec);
                 //printf("DEBUG: num_bytes: %ld\n",num_bytes);
                 //printf("DEBUG: %s\n",jsonbuf);
@@ -369,7 +371,7 @@ int process_nfcapd_files(char* filename)
                  * optimize the mapping first
                  */
                 continue;
-                snprintf(url, 128,"%s%ld",URLROOT,cnt); 
+                //snprintf(url, 128,"%s%ld",URLROOT,cnt); 
                 curl_easy_setopt(curl, CURLOPT_URL, url);
 
                 curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonbuf);
