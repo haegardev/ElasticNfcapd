@@ -320,77 +320,52 @@ int process_nfcapd_files(elastic_nfcapd_t* enf)
     master_record_t* rec;
     CURL* curl;
     char* jsonbuf;
-    CURLcode res;
-    struct curl_slist *headers;
+    char* reply;
     char* url;
     long cnt;
     char *p;
     size_t rsize; //remaining size
     size_t num_bytes;
-    
-    headers = NULL;
-    jsonbuf = calloc(IMPORTCHUNKS*SIZE_PER_CHUNK,1);
+    #ifdef DEBUGCURL
+    printf("Used buffer size: %d\n",IMPORTCHUNKS*SIZE_PER_CHUNK);
+    #endif 
+    jsonbuf = xalloc(IMPORTCHUNKS*SIZE_PER_CHUNK,1);
+    reply = xalloc(1024,1);
     rsize = IMPORTCHUNKS * SIZE_PER_CHUNK;
-    url = calloc(128,1);
-    assert(url);
-    assert(jsonbuf);
+    url = xalloc(128,1);
+    snprintf(url, 128, "%s/_bulk",enf->baseurl);
     p = jsonbuf;
-
     cnt = 0;
     curl = curl_easy_init();
-    curl_easy_setopt(curl, CURLOPT_POST,1L); 
-    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
-    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
-    headers = curl_slist_append(headers, "Content-Type: application/json");
-    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers); 
     states = initlib(NULL, enf->nfcapdfilename, NULL);
     if (states) {
         do {
             rec = get_next_record(states);
             if (rec) {
                 cnt++;
-                /* Fill the buffer */
-                //printf("DEBUG: rsize: %ld\n",rsize);
-                // Build description
                 num_bytes = snprintf(p,1024, \
                 "{\"index\": {\"_index\":\"%s\",\"_type\":\"%s\",\"_id\":%ld}}\n",
                 enf->indexname, enf->doctype, cnt);
                 p+=num_bytes;
                 rsize-=num_bytes;
                 num_bytes = build_json_doc(p, rsize,rec);
-                //printf("DEBUG: num_bytes: %ld\n",num_bytes);
-                //printf("DEBUG: %s\n",jsonbuf);
                 p+=num_bytes;
                 rsize-=num_bytes;
                 if (rsize < SIZE_PER_CHUNK) { 
-                    //printf("DEBUG: There is not enough space for placing the next chunk %ld\n",rsize);
                     printf("----- BEGIN DUMP ---\n");
                     printf("%s\n",jsonbuf);
+                    printf("Buffer length: %ld\n",strlen(jsonbuf));
                     printf("----- END DUMP ---\n");
+                    //if (send_json_request(curl, url, jsonbuf, 
+                    //    reply, 1024) != 200) {
+                    //    fprintf(stderr,"Insertion failed!\n");
+                    //}
                     jsonbuf[0] = 0;
                     p = jsonbuf;
                     rsize = IMPORTCHUNKS * SIZE_PER_CHUNK;
                 }
-                /* TODO  build here a bulk message for elastic search
-                 * FIXME depends on the previously used mapping, so fix
-                 * optimize the mapping first
-                 */
-                continue;
-                //snprintf(url, 128,"%s%ld",URLROOT,cnt); 
-                curl_easy_setopt(curl, CURLOPT_URL, url);
-
-                curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonbuf);
-              
-                res = curl_easy_perform(curl);
-                if (res != CURLE_OK) {
-                    fprintf(stderr,"curl_easy_perform failed %s request=%s\n",
-                            curl_easy_strerror(res), jsonbuf);
-                    continue;
-                }
-                //printf("[INFO] sent request %s to %s\n",jsonbuf,url);
             }
         } while (rec);
-      //TODO free slists
      } 
     return EXIT_SUCCESS;
 }
