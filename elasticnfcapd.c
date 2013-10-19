@@ -104,10 +104,12 @@ int build_json_doc(char* jsonbuffer, size_t size, master_record_t* r)
     ds[40-1] = 0;
     snprintf((char*)&firstseen, 32, "%d", r->first);
     if (strptime(firstseen, "%s",&tm)) {
-        strftime((char*)&firstseen, 32, "%Y%m%d %H:%M:%S",&tm);
+        //FIXME ignore millis
+        strftime((char*)&firstseen, 32, "%Y-%m-%d %H:%M:%S.000",&tm);
         snprintf((char*)&lastseen,  32, "%d", r->last);  
         if (strptime(lastseen, "%s",&tm)) {
-            strftime((char*)&lastseen, 32, "%Y%m%d %H:%M:%S", &tm);
+            //FIXME ignore millis
+            strftime((char*)&lastseen, 32, "%Y-%m-%d %H:%M:%S.000", &tm);
             //TODO check bytes and endianness of ports
             //TODO test integer encoding for IPaddresses
             return snprintf(jsonbuffer, size,"{\"firstseen\":\"%s\",\
