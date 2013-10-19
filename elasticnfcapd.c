@@ -84,8 +84,10 @@ int build_json_doc(char* jsonbuffer, size_t size, master_record_t* r)
 {
     char as[40];
     char ds[40];
-    char firstseen[20];
-    char lastseen[20];
+    char firstseen[32];
+    char lastseen[32];
+    char *p;
+    size_t num_bytes;
     struct tm tm;
     if ( (r->flags & FLAG_IPV6_ADDR ) != 0 ) { // IPv6
     r->v6.srcaddr[0] = htonll(r->v6.srcaddr[0]);
@@ -104,11 +106,11 @@ int build_json_doc(char* jsonbuffer, size_t size, master_record_t* r)
     ds[40-1] = 0;
     snprintf((char*)&firstseen, 32, "%d", r->first);
     if (strptime(firstseen, "%s",&tm)) {
-        //FIXME ignore millis
-        strftime((char*)&firstseen, 32, "%Y-%m-%d %H:%M:%S.000",&tm);
+        num_bytes = strftime((char*)&firstseen, 32, "%Y-%m-%d %H:%M:%S",&tm);
+        p = ((char*)&firstseen) + num_bytes;
+        snprintf(p,32-num_bytes, ".%3d", r->msec_first);
         snprintf((char*)&lastseen,  32, "%d", r->last);  
         if (strptime(lastseen, "%s",&tm)) {
-            //FIXME ignore millis
             strftime((char*)&lastseen, 32, "%Y-%m-%d %H:%M:%S.000", &tm);
             //TODO check bytes and endianness of ports
             //TODO test integer encoding for IPaddresses
