@@ -32,7 +32,7 @@
 #define DEFAULT_DOCTYPE "nfcapd"
 #define IMPORTCHUNKS 10000 
 #define SIZE_PER_CHUNK 300 
-#define NUM_REPLICAS 1 
+#define NUM_REPLICAS 0 
 #define NUM_SHARDS 5 
 /* Disable this for suppressing curl debug messages */
 //#define DEBUGCURL 

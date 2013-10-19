@@ -30,3 +30,13 @@ Volume issues?
 - Set the number of replicas to 0
 - Code profiling and do parallel bulk imports?
 
+=Second test=
+Config: replicas = 0
+
+Insertion time+-5minutes
+
+count: 9397746
+store: 2.1gb?
+
+
+
