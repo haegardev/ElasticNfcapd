@@ -356,10 +356,10 @@ int process_nfcapd_files(elastic_nfcapd_t* enf)
                     printf("%s\n",jsonbuf);
                     printf("Buffer length: %ld\n",strlen(jsonbuf));
                     printf("----- END DUMP ---\n");
-                    //if (send_json_request(curl, url, jsonbuf, 
-                    //    reply, 1024) != 200) {
-                    //    fprintf(stderr,"Insertion failed!\n");
-                    //}
+                    if (send_json_request(curl, url, jsonbuf, 
+                        reply, 1024) != 200) {
+                        fprintf(stderr,"Insertion failed!\n");
+                    }
                     jsonbuf[0] = 0;
                     p = jsonbuf;
                     rsize = IMPORTCHUNKS * SIZE_PER_CHUNK;
