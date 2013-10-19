@@ -108,14 +108,13 @@ int build_json_doc(char* jsonbuffer, size_t size, master_record_t* r)
     if (strptime(firstseen, "%s",&tm)) {
         num_bytes = strftime((char*)&firstseen, 32, "%Y-%m-%d %H:%M:%S",&tm);
         p = ((char*)&firstseen) + num_bytes;
-        snprintf(p,32-num_bytes, ".%3d", r->msec_first);
+        snprintf(p,32-num_bytes, ".%03d", r->msec_first);
         snprintf((char*)&lastseen,  32, "%d", r->last);  
         if (strptime(lastseen, "%s",&tm)) {
             num_bytes = strftime((char*)&lastseen, 32, "%Y-%m-%d %H:%M:%S", 
                                  &tm);
             p = ((char*)&lastseen) + num_bytes;
-            snprintf(p, 32-num_bytes, ".%3d", r->msec_last);
-            //TODO test if leading zeros are needed for insertion
+            snprintf(p, 32-num_bytes, ".%03d", r->msec_last);
             //TODO dump output of elasticsearch and compare it with output of 
             //nfdump
             return snprintf(jsonbuffer, size,"{\"firstseen\":\"%s\",\
