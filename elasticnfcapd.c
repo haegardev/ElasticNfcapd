@@ -30,12 +30,12 @@
 #define BASEURL "http://localhost:9200"
 #define DEFAULT_INDEX "netflow"
 #define DEFAULT_DOCTYPE "nfcapd"
-#define IMPORTCHUNKS 10 
+#define IMPORTCHUNKS 10000 
 #define SIZE_PER_CHUNK 300 
 #define NUM_REPLICAS 1 
 #define NUM_SHARDS 5 
 /* Disable this for suppressing curl debug messages */
-#define DEBUGCURL 
+//#define DEBUGCURL 
 #define ERRSIZE 1024
 
 #ifdef WORDS_BIGENDIAN
@@ -359,10 +359,10 @@ int process_nfcapd_files(elastic_nfcapd_t* enf)
                 p+=num_bytes;
                 rsize-=num_bytes;
                 if (rsize < SIZE_PER_CHUNK) { 
-                    printf("----- BEGIN DUMP ---\n");
-                    printf("%s\n",jsonbuf);
-                    printf("Buffer length: %ld\n",strlen(jsonbuf));
-                    printf("----- END DUMP ---\n");
+                    //printf("----- BEGIN DUMP ---\n");
+                    //printf("%s\n",jsonbuf);
+                    //printf("Buffer length: %ld\n",strlen(jsonbuf));
+                    //printf("----- END DUMP ---\n");
                     if (send_json_request(curl, url, jsonbuf, 
                         reply, 1024) != 200) {
                         fprintf(stderr,"Insertion failed!\n");

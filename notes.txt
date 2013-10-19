@@ -1,0 +1,32 @@
+=First stress test=
+
+==Scenario==
+ Import of 5 minutes nfcapd file
+
+==Input==
+
+Filename: nfcapd.201309301118
+Number of flow records: 9406539
+
+==Config==
+- 10000 json objects where inserted per bulk import
+- Number of shards 5
+- Number of replicas 1
+
+Duration: +-10 minutes
+Space usage: 1,6GB
+Number of documents: 9397746 
+Missed flows: 8793
+
+=Conclusions=
+
+Volume issues?
+
+1,6 GB per 5 minutes 
+460.8 GB per day?
+
+
+=Next tracks=
+- Set the number of replicas to 0
+- Code profiling and do parallel bulk imports?
+
