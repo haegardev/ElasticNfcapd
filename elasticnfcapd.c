@@ -111,9 +111,13 @@ int build_json_doc(char* jsonbuffer, size_t size, master_record_t* r)
         snprintf(p,32-num_bytes, ".%3d", r->msec_first);
         snprintf((char*)&lastseen,  32, "%d", r->last);  
         if (strptime(lastseen, "%s",&tm)) {
-            strftime((char*)&lastseen, 32, "%Y-%m-%d %H:%M:%S.000", &tm);
-            //TODO check bytes and endianness of ports
-            //TODO test integer encoding for IPaddresses
+            num_bytes = strftime((char*)&lastseen, 32, "%Y-%m-%d %H:%M:%S", 
+                                 &tm);
+            p = ((char*)&lastseen) + num_bytes;
+            snprintf(p, 32-num_bytes, ".%3d", r->msec_last);
+            //TODO test if leading zeros are needed for insertion
+            //TODO dump output of elasticsearch and compare it with output of 
+            //nfdump
             return snprintf(jsonbuffer, size,"{\"firstseen\":\"%s\",\
 \"lastseen\":\"%s\", \"srcaddrv4\":\"%s\", \"dstaddrv4\":\"%s\",\"srcport\":\"%d\",\
 \"dstport\":%d, \"bytes\":%ld,\"flows\":%ld,\"srcas\":%d,\"dstas\":%d}\n", 
